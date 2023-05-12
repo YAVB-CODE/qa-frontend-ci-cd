@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CI/CD</title>
+  </head>
+  <body>
+    <main class="app">
+      <span id="loading">Loading...</span>
+      <ul id="list"></ul>
+    </main>
+    <script type="module">
+      class Axios {
+        #baseApi = "";
+        #headersDefault = {};
+
+        create({ baseApi, headersDefault }) {
+          this.#baseApi = baseApi;
+          this.#headersDefault = headersDefault;
+          return this;
+        }
+
+        get({ url, headers }) {
+          return new Promise(async (resolve, reject) => {
+            try {
+              const response = await fetch(`${this.#baseApi}${url}`, {
+                method: "GET",
+                headers: { ...this.#headersDefault, ...headers },
+              });
+              const responseParseJSON = await response.json();
+              resolve(responseParseJSON);
+            } catch (error) {
+              reject(error);
+            }
+          });
+        }
+      }
+
+      class Application {
+        constructor() {
+          this.serviceTodos = new Axios().create({
+            baseApi: "https://jsonplaceholder.typicode.com",
+            headers: { "content-type": "application/json" },
+          });
+          this.listElement = document.getElementById("list");
+          this.loadingElement = document.getElementById("loading");
+        }
+
+        getTodos() {
+          this.serviceTodos
+            .get({ url: "/todos" })
+            .then((response) => {
+              if (Array.isArray(response)) {
+                response.forEach((todo) => {
+                  const liElement = document.createElement("li");
+                  liElement.setAttribute("data-test", "list-item");
+                  liElement.innerText = todo.title;
+                  this.listElement.appendChild(liElement);
+                });
+              }
+
+              this.loadingElement.style.display = "none";
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      }
+      const APP = new Application();
+
+      APP.getTodos();
+    </script>
+  </body>
+</html>

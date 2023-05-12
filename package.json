@@ -1,0 +1,16 @@
+{
+  "name": "ci-cd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:e2e": "npx http-server --silent --port 8080 -P http://127.0.0.1:8080 & wait-on http://127.0.0.1:8080 & npx cypress run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cypress": "^12.12.0",
+    "http-server": "^14.1.1"
+  }
+}
